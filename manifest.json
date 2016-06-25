@@ -3,7 +3,7 @@
 	
 	"name": "Web Filter",
 	"description": "Enhance your web browsing experience!",
-	"version": "0.2",
+	"version": "0.2.1",
 	
 	"browser_action": {
 		"default_icon": "icon.png",
