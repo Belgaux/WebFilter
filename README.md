@@ -1,2 +1,2 @@
 # WebFilter
-small chrome extension
+small chrome extension, i suck at javascript
