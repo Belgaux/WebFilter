@@ -14,7 +14,6 @@ function sendMessage() {
 	}
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		var msg = document.getElementById("word").value;
-		console.log(button_status);
 		if (msg) {
 			chrome.tabs.sendMessage(tabs[0].id, {
 				message: msg,
