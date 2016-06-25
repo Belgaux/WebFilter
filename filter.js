@@ -1,7 +1,7 @@
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	var word_list = request.message.replace(/ /g, '').split(",");
 	var status = request.status;
-	if (status === "sensor") word_list.forEach(sensor);
+	if (status === "censor") word_list.forEach(censor);
 	if (status === "enhance") word_list.forEach(enhance);
 	if (status === "delete") word_list.forEach(hide);
 });
@@ -10,7 +10,7 @@ function enhance(word) {
 	filterTags(word, "<span class=\"enhance\">$&</span>");
 }
 
-function sensor(word) {
+function censor(word) {
 	filterTags(word, "*".repeat(word.length));
 }
 
