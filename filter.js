@@ -1,7 +1,11 @@
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	var word_list = request.message.replace(/ /g, '').split(",");
-	console.log(word_list);
-	word_list.forEach(applyToAllTags);
+	var status = request.status;
+	console.log(status);
+	console.log(status === "sensor");
+	if (status === "sensor") word_list.forEach(sensorAllTags);
+	if (status === "enhance") word_list.forEach(applyToAllTags);
+	if (status === "delete") word_list.forEach(deleteAllTags);
 });
 
 function applyToAllTags(word) {
@@ -11,14 +15,41 @@ function applyToAllTags(word) {
 		
 	if (p_tags !== 0)
 		applyToAllWords(p_tags, word, "affected");
-		//sensorAllWords(p_tags, word);
 	if (a_tags.length !== 0) {
 		applyToAllWords(a_tags, word, "affected");
-		//sensorAllWords(a_tags, word);
 	}
 	if (h_tags.length !== 0) {
 		applyToAllWords(h_tags, word, "affected");
-		//sensorAllWords(h_tags, word);
+	}
+}
+
+function sensorAllTags(word) {
+	var p_tags = document.getElementsByTagName("p");
+	var a_tags = document.getElementsByTagName("a");	
+	var h_tags = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+		
+	if (p_tags !== 0)
+		sensorAllWords(p_tags, word);
+	if (a_tags.length !== 0) {
+		sensorAllWords(a_tags, word);
+	}
+	if (h_tags.length !== 0) {
+		sensorAllWords(h_tags, word);
+	}
+}
+
+function deleteAllTags(word) {
+	var p_tags = document.getElementsByTagName("p");
+	var a_tags = document.getElementsByTagName("a");	
+	var h_tags = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+		
+	if (p_tags !== 0)
+		deleteAllWords(p_tags, word);
+	if (a_tags.length !== 0) {
+		deleteAllWords(a_tags, word);
+	}
+	if (h_tags.length !== 0) {
+		deleteAllWords(h_tags, word);
 	}
 }
 
@@ -26,6 +57,14 @@ function sensorAllWords(element_list, search_word) {
 	for (var i = 0; i < element_list.length; i++) {
 		var inner_string = element_list[i].innerHTML;
 		element_list[i].innerHTML = sensorWords(inner_string, search_word);
+	}
+}
+
+function deleteAllWords(element_list, search_word) {
+	for (var i = 0; i < element_list.length; i++) {
+		var inner_string = element_list[i].innerHTML;
+		var node = element_list[i];
+		deleteWords(node, inner_string, search_word);
 	}
 }
 
@@ -53,15 +92,15 @@ function sensorWords(str, keyword) {
 	return str.replace(re, keyword[0] + "*".repeat(keyword.length - 1));
 }
 
-function deleteWords(str, keyword) {
+function deleteWords(node, str, keyword) {
 	var re = new RegExp("\\b" + keyword + "\\b", "gi");
 	if (str.match(re)) {
-		deleteRow(str);
+		deleteMe(node);
 	}
 }
 
-function deleteRow(e) {
-    e.parentNode.parentNode.parentNode.removeChild(e.parentNode.parentNode);
+function deleteMe(e) {
+    e.parentNode.removeChild(e);
 }
 
 String.prototype.repeat = function(num) {
