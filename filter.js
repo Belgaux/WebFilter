@@ -1,96 +1,63 @@
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	var word_list = request.message.replace(/ /g, '').split(",");
 	var status = request.status;
-	if (status === "sensor") word_list.forEach(sensorAllTags);
-	if (status === "enhance") word_list.forEach(applyToAllTags);
-	if (status === "delete") word_list.forEach(deleteAllTags);
+	if (status === "sensor") word_list.forEach(sensor);
+	if (status === "enhance") word_list.forEach(enhance);
+	if (status === "delete") word_list.forEach(hide);
 });
 
-function applyToAllTags(word) {
+function enhance(word) {
+	filterTags(word, "<span class=\"enhance\">$&</span>");
+}
+
+function sensor(word) {
+	filterTags(word, "*".repeat(word.length));
+}
+
+function hide(word) {
+	filterTags(word, "<span class=\"deleted\">$&</span>");
+}
+
+function filterTags(word, r_string) {
 	var p_tags = document.getElementsByTagName("p");
 	var a_tags = document.getElementsByTagName("a");	
 	var h_tags = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
 		
-	if (p_tags !== 0)
-		applyToAllWords(p_tags, word, "affected");
+	if (p_tags !== 0) {
+		filterElements(p_tags, word, r_string);
+	}
 	if (a_tags.length !== 0) {
-		applyToAllWords(a_tags, word, "affected");
+		filterElements(a_tags, word, r_string);
 	}
 	if (h_tags.length !== 0) {
-		applyToAllWords(h_tags, word, "affected");
-	}
+		filterElements(h_tags, word, r_string);
+	}	
 }
 
-function sensorAllTags(word) {
-	var p_tags = document.getElementsByTagName("p");
-	var a_tags = document.getElementsByTagName("a");	
-	var h_tags = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
-		
-	if (p_tags !== 0)
-		sensorAllWords(p_tags, word);
-	if (a_tags.length !== 0) {
-		sensorAllWords(a_tags, word);
-	}
-	if (h_tags.length !== 0) {
-		sensorAllWords(h_tags, word);
-	}
-}
-
-function deleteAllTags(word) {
-	var p_tags = document.getElementsByTagName("p");
-	var a_tags = document.getElementsByTagName("a");	
-	var h_tags = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
-		
-	if (p_tags !== 0)
-		deleteAllWords(p_tags, word);
-	if (a_tags.length !== 0) {
-		deleteAllWords(a_tags, word);
-	}
-	if (h_tags.length !== 0) {
-		deleteAllWords(h_tags, word);
-	}
-}
-
-function sensorAllWords(element_list, search_word) {
+/*
+	element_list: 		array of DOM elements
+	search_word: 		word to be filtered
+	replacement_string: string to replace the filtered word
+*/
+function filterElements(element_list, search_word, replacement_string) {
 	for (var i = 0; i < element_list.length; i++) {
 		var inner_string = element_list[i].innerHTML;
-		element_list[i].innerHTML = sensorWords(inner_string, search_word);
-	}
-}
-
-function deleteAllWords(element_list, search_word) {
-	for (var i = 0; i < element_list.length; i++) {
-		var inner_string = element_list[i].innerHTML.toUpperCase();
-		if (inner_string.indexOf(search_word.toUpperCase()) > -1) {
-			console.log("deleting" + element_list[i])
-			element_list[i].parentNode.removeChild(element_list[i]);
-		}
+		console.log("test");
+		element_list[i].innerHTML = replaceWords(inner_string, 
+										search_word, 
+										replacement_string);
 	}
 }
 
 /*
-	Takes a list of DOM elements and applies a span with a class name to each word matching the search word.
+	str:				any string
+	keyword:			word to be filtered
+	replacement_string: string to replace keyword
 */
-function applyToAllWords(element_list, search_word, class_name) {
-
-	for (var i = 0; i < element_list.length; i++) {
-		var inner_string = element_list[i].innerHTML;
-		element_list[i].innerHTML = wrapWords(inner_string, search_word, class_name);
-	}
-}
-
-/*
-	Find all instances of the keyword in the string and wrap them in spans with a classname
-*/
-function wrapWords(str, keyword, class_name) {
+function replaceWords(str, keyword, replacement_string) {
 	// regex matches all whole words, ignoring case
 	var re = new RegExp("\\b" + keyword + "\\b", "gi");
-	return str.replace(re, "<span class=\"" + class_name + "\">$&</span>");
-}
-
-function sensorWords(str, keyword) {
-	var re = new RegExp("\\b" + keyword + "\\b", "gi");
-	return str.replace(re, "*".repeat(keyword.length));
+	return str.replace(re, replacement_string);
 }
 
 String.prototype.repeat = function(num) {
